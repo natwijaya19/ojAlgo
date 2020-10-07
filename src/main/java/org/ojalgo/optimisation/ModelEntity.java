@@ -51,6 +51,10 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
 
         double expL = MissingMath.log10(largest.doubleValue(), PrimitiveMath.ZERO);
 
+        if (expL == 0) {
+            return 0;
+        }
+
         int doubleRange = 2 * range;
 
         if (expL > doubleRange) {

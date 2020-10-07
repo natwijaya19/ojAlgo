@@ -56,6 +56,7 @@ public final class Variable extends ModelEntity<Variable> {
 
     private IntIndex myIndex = null;
     private boolean myInteger = false;
+    private transient ExpressionsBasedModel myModel = null;
     private transient boolean myUnbounded = false;
     private BigDecimal myValue = null;
 
@@ -70,6 +71,8 @@ public final class Variable extends ModelEntity<Variable> {
         myIndex = null;
         myInteger = variableToCopy.isInteger();
         myValue = variableToCopy.getValue();
+
+        myModel = null;
     }
 
     @Override
@@ -276,7 +279,7 @@ public final class Variable extends ModelEntity<Variable> {
 
         Variable retVal = this.copy();
 
-        retVal.setIndex(myIndex);
+        retVal.setIndex(myModel, myIndex);
 
         return retVal;
     }
@@ -307,6 +310,13 @@ public final class Variable extends ModelEntity<Variable> {
         AggregatorFunction<BigDecimal> largest = aggregators.largest();
         AggregatorFunction<BigDecimal> smallest = aggregators.smallest();
 
+        if (myModel != null) {
+
+            myModel.visitColumn(this, largest, smallest);
+
+            return -ModelEntity.deriveAdjustmentExponent(largest, smallest, 12);
+
+        }
         BigDecimal lowerLimit = this.getLowerLimit();
         if (lowerLimit != null) {
             if (lowerLimit.signum() == 0) {
@@ -360,11 +370,16 @@ public final class Variable extends ModelEntity<Variable> {
         this.level(value).setValue(value);
     }
 
-    void setIndex(final IntIndex index) {
+    void setIndex(final ExpressionsBasedModel model, final IntIndex index) {
+        Objects.requireNonNull(model, "The model cannot be null!");
         Objects.requireNonNull(index, "The index cannot be null!");
+        if (myModel != null && !myModel.equals(model)) {
+            throw new IllegalStateException("Cannot change a variable's model!");
+        }
         if (myIndex != null && myIndex.index != index.index) {
             throw new IllegalStateException("Cannot change a variable's index, or add a variable to more than one model!");
         }
+        myModel = model;
         myIndex = index;
     }
 
