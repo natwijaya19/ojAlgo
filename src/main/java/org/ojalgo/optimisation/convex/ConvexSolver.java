@@ -761,7 +761,7 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
         return myMatrices.toString();
     }
 
-    protected boolean computeGeneral(final Collectable<Double, ? super PhysicalStore<Double>> matrix) {
+    protected boolean computeGeneral(final Collectable<? super PhysicalStore<Double>> matrix) {
         return mySolverGeneral.compute(matrix);
     }
 
@@ -792,9 +792,9 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
 
     }
 
-    protected abstract Collectable<Double, ? super PhysicalStore<Double>> getIterationKKT();
+    protected abstract Collectable<? super PhysicalStore<Double>> getIterationKKT();
 
-    protected abstract Collectable<Double, ? super PhysicalStore<Double>> getIterationRHS();
+    protected abstract Collectable<? super PhysicalStore<Double>> getIterationRHS();
 
     protected MatrixStore<Double> getMatrixAE() {
         return myMatrices.getAE();
@@ -846,19 +846,19 @@ public abstract class ConvexSolver extends GenericSolver implements UpdatableSol
         return 0;
     }
 
-    protected MatrixStore<Double> getSolutionGeneral(final Collectable<Double, ? super PhysicalStore<Double>> rhs) {
+    protected MatrixStore<Double> getSolutionGeneral(final Collectable<? super PhysicalStore<Double>> rhs) {
         return mySolverGeneral.getSolution(rhs);
     }
 
-    protected MatrixStore<Double> getSolutionGeneral(final Collectable<Double, ? super PhysicalStore<Double>> rhs, final PhysicalStore<Double> preallocated) {
+    protected MatrixStore<Double> getSolutionGeneral(final Collectable<? super PhysicalStore<Double>> rhs, final PhysicalStore<Double> preallocated) {
         return mySolverGeneral.getSolution(rhs, preallocated);
     }
 
-    protected MatrixStore<Double> getSolutionQ(final Collectable<Double, ? super PhysicalStore<Double>> rhs) {
+    protected MatrixStore<Double> getSolutionQ(final Collectable<? super PhysicalStore<Double>> rhs) {
         return mySolverQ.getSolution(rhs);
     }
 
-    protected MatrixStore<Double> getSolutionQ(final Collectable<Double, ? super PhysicalStore<Double>> rhs, final PhysicalStore<Double> preallocated) {
+    protected MatrixStore<Double> getSolutionQ(final Collectable<? super PhysicalStore<Double>> rhs, final PhysicalStore<Double> preallocated) {
         return mySolverQ.getSolution(rhs, preallocated);
     }
 
