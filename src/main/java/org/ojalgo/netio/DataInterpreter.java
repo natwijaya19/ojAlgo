@@ -21,28 +21,43 @@
  */
 package org.ojalgo.netio;
 
-public final class LineSplittingParser implements BasicParser<String[]> {
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
-    private final String myRegExp;
-    private final boolean myTrim;
+import org.ojalgo.type.function.OperatorWithException;
 
-    public LineSplittingParser() {
-        this("\\s+", true);
+public interface DataInterpreter<T> extends DataReader.Deserializer<T>, DataWriter.Serializer<T> {
+
+    DataInterpreter<String> STRING = new DataInterpreter<String>() {
+
+        public String deserialize(final DataInput input) throws IOException {
+            return input.readUTF();
+        }
+
+        public void serialize(final String data, final DataOutput output) throws IOException {
+            output.writeUTF(data);
+        }
+
+    };
+
+    default DataReader<T> newReader(final File file) {
+        return DataReader.of(file, this);
     }
 
-    public LineSplittingParser(final String regex) {
-        this(regex, false);
+    default DataReader<T> newReader(final File file, final OperatorWithException<InputStream> filter) {
+        return DataReader.of(file, this, filter);
     }
 
-    public LineSplittingParser(final String regex, final boolean trim) {
-        super();
-        myRegExp = regex;
-        myTrim = trim;
+    default DataWriter<T> newWriter(final File file) {
+        return DataWriter.of(file, this);
     }
 
-    @Override
-    public String[] parse(final String line) {
-        return (myTrim ? line.trim() : line).split(myRegExp);
+    default DataWriter<T> newWriter(final File file, final OperatorWithException<OutputStream> filter) {
+        return DataWriter.of(file, this, filter);
     }
 
 }

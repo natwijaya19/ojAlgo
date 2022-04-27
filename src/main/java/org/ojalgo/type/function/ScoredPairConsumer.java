@@ -19,30 +19,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.netio;
+package org.ojalgo.type.function;
 
-public final class LineSplittingParser implements BasicParser<String[]> {
+import org.ojalgo.type.keyvalue.EntryPair;
+import org.ojalgo.type.keyvalue.EntryPair.Dual;
 
-    private final String myRegExp;
-    private final boolean myTrim;
+@FunctionalInterface
+public interface ScoredPairConsumer<T> extends AutoConsumer<EntryPair.KeyedPrimitive<Dual<T>>> {
 
-    public LineSplittingParser() {
-        this("\\s+", true);
+    default void accept(final EntryPair.KeyedPrimitive<Dual<T>> item) {
+        Dual<T> key = item.getKey();
+        this.accept(key.first, key.second, item.floatValue());
     }
 
-    public LineSplittingParser(final String regex) {
-        this(regex, false);
-    }
-
-    public LineSplittingParser(final String regex, final boolean trim) {
-        super();
-        myRegExp = regex;
-        myTrim = trim;
-    }
-
-    @Override
-    public String[] parse(final String line) {
-        return (myTrim ? line.trim() : line).split(myRegExp);
-    }
+    void accept(T id1, T id2, float score);
 
 }

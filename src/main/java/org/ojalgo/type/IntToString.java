@@ -19,30 +19,47 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.netio;
+package org.ojalgo.type;
 
-public final class LineSplittingParser implements BasicParser<String[]> {
+public final class IntToString {
 
-    private final String myRegExp;
-    private final boolean myTrim;
+    static final String PADDING = "0000000000";
 
-    public LineSplittingParser() {
-        this("\\s+", true);
+    static int numberOfDigits(int number) {
+        if (number == 0) {
+            return 1;
+        }
+        int count = 0;
+        while (number != 0) {
+            number /= 10;
+            count++;
+        }
+        return count;
     }
 
-    public LineSplittingParser(final String regex) {
-        this(regex, false);
-    }
+    private final int myMaxNumberOfDigits;
 
-    public LineSplittingParser(final String regex, final boolean trim) {
+    public IntToString(final int range) {
         super();
-        myRegExp = regex;
-        myTrim = trim;
+        myMaxNumberOfDigits = IntToString.numberOfDigits(range - 1);
     }
 
-    @Override
-    public String[] parse(final String line) {
-        return (myTrim ? line.trim() : line).split(myRegExp);
+    /**
+     * Will adjust the length of the input string to match what would have been created by
+     * {@link #toString(int)} - assuming that if lengths don't match it's because of different number of
+     * prefix zeros.
+     */
+    public String align(final String value) {
+        if (value.length() == myMaxNumberOfDigits) {
+            return value;
+        }
+        return this.toString(Integer.parseInt(value));
+    }
+
+    public String toString(final int value) {
+        String retVal = Integer.toString(value);
+        retVal = PADDING + retVal;
+        return retVal.substring(retVal.length() - myMaxNumberOfDigits);
     }
 
 }

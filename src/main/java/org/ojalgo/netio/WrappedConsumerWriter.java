@@ -21,28 +21,33 @@
  */
 package org.ojalgo.netio;
 
-public final class LineSplittingParser implements BasicParser<String[]> {
+import java.io.IOException;
 
-    private final String myRegExp;
-    private final boolean myTrim;
+import org.ojalgo.type.function.AutoConsumer;
 
-    public LineSplittingParser() {
-        this("\\s+", true);
-    }
+final class WrappedConsumerWriter<T> implements ToFileWriter<T> {
 
-    public LineSplittingParser(final String regex) {
-        this(regex, false);
-    }
+    AutoConsumer<T> myDelegate;
 
-    public LineSplittingParser(final String regex, final boolean trim) {
+    WrappedConsumerWriter(final AutoConsumer<T> delegate) {
         super();
-        myRegExp = regex;
-        myTrim = trim;
+        myDelegate = delegate;
     }
 
-    @Override
-    public String[] parse(final String line) {
-        return (myTrim ? line.trim() : line).split(myRegExp);
+    public void close() throws IOException {
+        try {
+            myDelegate.close();
+        } catch (Exception cause) {
+            if (cause instanceof IOException) {
+                throw (IOException) cause;
+            } else {
+                throw new RuntimeException(cause);
+            }
+        }
+    }
+
+    public void write(final T item) {
+        myDelegate.accept(item);
     }
 
 }
